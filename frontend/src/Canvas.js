@@ -35,15 +35,33 @@ const Canvas = props => {
             const ctx = canvas.getContext('2d');
             ctx.canvas.width = window.innerWidth;
             ctx.canvas.height = window.innerHeight;
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            if (finalX && finalY && !tracking) {
-                ctx.rect(fixedX, fixedY, finalX - fixedX, finalY - fixedY);
-            } else {
-                ctx.rect(fixedX, fixedY, currX - fixedX, currY - fixedY);
+            // add image cat.webp to canvas
+            const img = new Image(ctx.canvas.width, ctx.canvas.height);
+            img.src = './cat.webp';
+            img.onload = () => {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(img, 0, 0);
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                if (finalX && finalY && !tracking) {
+                    ctx.rect(fixedX, fixedY, finalX - fixedX, finalY - fixedY);
+                } else {
+                    ctx.rect(fixedX, fixedY, currX - fixedX, currY - fixedY);
+                }
+                ctx.stroke();
             }
-            ctx.stroke();
+        } else {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            ctx.canvas.width = window.innerWidth;
+            ctx.canvas.height = window.innerHeight;
+            // add image cat.webp to canvas
+            const img = new Image(ctx.canvas.width, ctx.canvas.height);
+            img.src = './cat.webp';
+            img.onload = () => {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.drawImage(img, 0, 0);
+            }
         }
     }, [currX, currY, finalX, finalY]);
 

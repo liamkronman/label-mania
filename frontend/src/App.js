@@ -4,7 +4,9 @@ import Canvas from './Canvas';
 
 function App() {
   return (
-    <Canvas />
+    <>
+      <Canvas style={{ zIndex: 1 }} />
+    </>
   );
 }
 
