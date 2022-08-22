@@ -33,6 +33,8 @@ const Canvas = props => {
         if (((currX && currY) || (finalX && finalY)) && finalX && finalY) {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
+            ctx.canvas.width = window.innerWidth;
+            ctx.canvas.height = window.innerHeight;
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.fillStyle = '#000';
             ctx.beginPath();
