@@ -1,20 +1,16 @@
 import "./App.css";
 import React from "react";
-import Canvas from "./Canvas";
+import Game from "./Game";
+import { io } from "socket.io-client";
 
 function App() {
-	return (
-		<div id="container">
-			<img
-				src={"./cat.webp"}
-				alt=""
-				style={{ zIndex: 0, position: "absolute" }}
-				draggable={false}
-			/>
-			<Canvas style={{ zIndex: 1, position: "fixed", top: 0 }} />
-			<br />
-		</div>
-	);
+	const URL = "http://localhost:3000";
+	const socket = io(URL, { autoConnect: false });
+
+	socket.connect();
+	socket.on("hello", (x: string) => console.log(x));
+
+	return <Game />;
 }
 
 export default App;

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, SetStateAction } from "react";
 
 interface PositionData {
 	currX: number | null;
@@ -64,7 +64,7 @@ const Canvas = (props: any) => {
 			ctx.canvas.height = window.innerHeight;
 
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-			ctx.fillStyle = "#000";
+			ctx.fillStyle = "#8888";
 			ctx.beginPath();
 			if (
 				position.finalX !== null &&
@@ -72,6 +72,12 @@ const Canvas = (props: any) => {
 				position.fixedX !== null &&
 				position.fixedY !== null
 			) {
+				ctx.fillRect(
+					position.fixedX - canvas.getBoundingClientRect().left, // todo: changes if you scroll
+					position.fixedY - canvas.getBoundingClientRect().top,
+					position.finalX - position.fixedX,
+					position.finalY - position.fixedY
+				);
 				ctx.rect(
 					position.fixedX - canvas.getBoundingClientRect().left, // todo: changes if you scroll
 					position.fixedY - canvas.getBoundingClientRect().top,
@@ -84,6 +90,12 @@ const Canvas = (props: any) => {
 				position.currX !== null &&
 				position.currY !== null
 			) {
+				ctx.fillRect(
+					position.fixedX - canvas.getBoundingClientRect().left,
+					position.fixedY - canvas.getBoundingClientRect().top,
+					position.currX - position.fixedX,
+					position.currY - position.fixedY
+				);
 				ctx.rect(
 					position.fixedX - canvas.getBoundingClientRect().left,
 					position.fixedY - canvas.getBoundingClientRect().top,
