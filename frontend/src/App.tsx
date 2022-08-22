@@ -11,7 +11,8 @@ function App() {
 				style={{ zIndex: 0, position: "absolute" }}
 				draggable={false}
 			/>
-			<Canvas style={{ zIndex: 1, position: "absolute", top: 0 }} />
+			<Canvas style={{ zIndex: 1, position: "fixed", top: 0 }} />
+			<br />
 		</div>
 	);
 }
