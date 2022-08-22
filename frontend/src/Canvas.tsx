@@ -53,61 +53,45 @@ const Canvas = (props: any) => {
 		if (
 			((position.currX !== null && position.currY !== null) ||
 				(position.finalX !== null && position.finalY !== null)) &&
-			(position.fixedX || position.fixedX == 0) &&
-			(position.fixedY || position.fixedY == 0)
+			(position.fixedX || position.fixedX === 0) &&
+			(position.fixedY || position.fixedY === 0)
 		) {
-			const canvas: any = canvasRef.current;
+			if (canvasRef.current === null) return;
+			const canvas: HTMLCanvasElement = canvasRef.current;
 			const ctx = canvas.getContext("2d");
+			if (ctx === null) return;
 			ctx.canvas.width = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
-			// add image cat.webp to canvas
-			const img = new Image(ctx.canvas.width, ctx.canvas.height);
-			img.src = "./cat.webp";
-			img.onload = () => {
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-				ctx.drawImage(img, 0, 0);
-				ctx.fillStyle = "#000";
-				ctx.beginPath();
-				if (
-					position.finalX !== null &&
-					position.finalY !== null &&
-					position.fixedX !== null &&
-					position.fixedY !== null
-				) {
-					ctx.rect(
-						position.fixedX,
-						position.fixedY,
-						position.finalX - position.fixedX,
-						position.finalY - position.fixedY
-					);
-				} else if (
-					position.fixedX !== null &&
-					position.fixedY !== null &&
-					position.currX !== null &&
-					position.currY !== null
-				) {
-					ctx.rect(
-						position.fixedX,
-						position.fixedY,
-						position.currX - position.fixedX,
-						position.currY - position.fixedY
-					);
-				}
-				ctx.stroke();
-			};
-		} else {
-			console.log("reached 2");
-			const canvas: any = canvasRef.current;
-			const ctx = canvas.getContext("2d");
-			ctx.canvas.width = window.innerWidth;
-			ctx.canvas.height = window.innerHeight;
-			// add image cat.webp to canvas
-			const img = new Image(ctx.canvas.width, ctx.canvas.height);
-			img.src = "./cat.webp";
-			img.onload = () => {
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-				ctx.drawImage(img, 0, 0);
-			};
+
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillStyle = "#000";
+			ctx.beginPath();
+			if (
+				position.finalX !== null &&
+				position.finalY !== null &&
+				position.fixedX !== null &&
+				position.fixedY !== null
+			) {
+				ctx.rect(
+					position.fixedX - canvas.getBoundingClientRect().left, // todo: changes if you scroll
+					position.fixedY - canvas.getBoundingClientRect().top,
+					position.finalX - position.fixedX,
+					position.finalY - position.fixedY
+				);
+			} else if (
+				position.fixedX !== null &&
+				position.fixedY !== null &&
+				position.currX !== null &&
+				position.currY !== null
+			) {
+				ctx.rect(
+					position.fixedX - canvas.getBoundingClientRect().left,
+					position.fixedY - canvas.getBoundingClientRect().top,
+					position.currX - position.fixedX,
+					position.currY - position.fixedY
+				);
+			}
+			ctx.stroke();
 		}
 	}, [
 		position.currX,
