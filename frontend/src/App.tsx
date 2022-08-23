@@ -5,7 +5,6 @@ import Signup from './components/Signup';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
 
 function App() {
-
 	return (
 		<Router>
 			<Routes>
