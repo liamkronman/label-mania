@@ -2,6 +2,9 @@ const uuidv4 = require("uuid").v4;
 
 var games = new Map();
 
+const ROUND_TIMEOUT = 30;
+const ROUND_DELAY = 10;
+
 class GameRoom {
 	constructor(gameID) {
 		this.gameID = gameID;
@@ -21,16 +24,15 @@ class GameRoom {
 		this.rounds.push(new_round);
 		const data = new_round.getRoundData();
 		io.to(this.gameID).emit("begin_round", data);
+		setTimeout(() => this.endRound(io, new_round), ROUND_TIMEOUT * 1000);
 	}
-	endRound(io) {
-		// todo: compute score diff, compute median trap
-		var round = this.rounds[this.rounds.length - 1];
+	endRound(io, round) {
 		if (round.roundStatus != 1) return;
+		// todo: compute score diff, compute median trap
 		round.roundStatus = 2;
 		const data = { score: this.userScores, traps: round.traps };
 		io.to(this.gameID).emit("end_round", data);
-
-		// todo: set timer to begin new round automatically
+		setTimeout(() => this.startRound(io), ROUND_DELAY * 1000);
 	}
 }
 
@@ -44,6 +46,27 @@ class Round {
 	getRoundData() {
 		return { imgurl: this.imgurl, target: this.target };
 	}
+	nth_ele(arr, l, r, n) {
+		// assert(0 <= n < r-l)
+		if (r - l <= 1) return;
+		k = Math.random(l, r);
+		p = arr[k];
+		var i = l,
+			j = r;
+		const swap = (a, b) => {
+			[arr[a], arr[b]] = [arr[b], arr[a]];
+		};
+		while (i < j)
+			if (p < arr[i]) swap(i, --j);
+			else ++i;
+		if (n < i - l) this.nth_ele(arr, l, i, n);
+		else this.nth_ele(arr, i, r, n - (i - l));
+	}
+	median(arr) {
+		n = arr.length;
+    this.nth_ele(arr, 0, arr.length, n//2);
+	}
+	computeTruth() {}
 }
 
 function joinGameRoom(socketID, gameID) {
@@ -79,11 +102,6 @@ class Connection {
 		/* Request round start */
 		socket.on("request_round_start", () => {
 			this.gameroom.startRound();
-		});
-
-		/* Request round end */
-		socket.on("request_round_start", () => {
-			this.gameroom.endRound();
 		});
 
 		socket.on("connect_error", (err) => {
