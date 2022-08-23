@@ -25,6 +25,6 @@ export interface DisplayTrapData extends Trap {
 export interface SubmitTrapData extends Trap {}
 
 export interface RoundEndData {
-	scores: { [key: string]: number };
-	traps: { [key: string]: DisplayTrapData };
+	scores?: { [key: string]: number };
+	traps?: { [key: string]: DisplayTrapData };
 }

@@ -30,10 +30,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 require("dotenv").config();
 
-const db = require('./models');
+const db = require("./models");
 db.sequelize.sync();
 
-require('./routes/auth.routes')(app);
+require("./routes/auth.routes")(app);
 // require('./routes/user.routes')(app);
 // require('./routes/app.routes')(app);
 

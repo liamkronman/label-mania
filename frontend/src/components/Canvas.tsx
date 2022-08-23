@@ -43,8 +43,6 @@ const Canvas = (props: any) => {
 		const imgRect = imgRef.current?.getBoundingClientRect();
 		const canvasRect = canvasRef.current?.getBoundingClientRect();
 		if (imgRect === undefined || canvasRect === undefined) return null;
-		console.log(trap);
-		console.log(imgRect);
 		return {
 			top: trap.top * imgRect.height - canvasRect.y + imgRect.y,
 			bottom: trap.bottom * imgRect.height - canvasRect.y + imgRect.y,
@@ -171,7 +169,6 @@ const Canvas = (props: any) => {
 		if (additionalTraps !== undefined)
 			for (const [, val] of Object.entries(additionalTraps)) {
 				const trap = toAbsCoords(val);
-				console.log(trap);
 				if (trap === null) continue; // todo: Throw an error
 
 				ctx.beginPath();
@@ -217,7 +214,7 @@ const Canvas = (props: any) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [position.finalX]);
 
-	return <canvas ref={canvasRef} {...props} />;
+	return <canvas ref={canvasRef} style={props.style} />;
 };
 
 export default Canvas;
