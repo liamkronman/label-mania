@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Canvas from "./Canvas";
 import {
 	DisplayTrapData,
@@ -8,6 +8,8 @@ import {
 	SubmitTrapData,
 	Trap,
 } from "./GameTypes";
+
+import { io, Socket } from "socket.io-client";
 
 const POST_BACKEND_URL = "./idk_where";
 const SAMPLE_ROUND_BEGIN_DATA = {
@@ -19,19 +21,34 @@ const Game = (props: any) => {
 	const [roundData, setRoundData] = useState<RoundBeginData>(
 		SAMPLE_ROUND_BEGIN_DATA
 	);
+	const [socket, setSocket] = useState<Socket>();
+
 	const [scores, setScores] = useState<{ [key: string]: number }>();
 	const [additionalTraps, setAdditionalTraps] = useState<{
 		[key: string]: DisplayTrapData;
-	}>({ player1: { top: 0.25, bottom: 0.75, left: 0.25, right: 0.75 } });
+	}>();
 
 	const imgRef = useRef<HTMLImageElement>(null);
 
-	function requestNewRound() {
-		axios.get(POST_BACKEND_URL).then((value) => {
-			const data: RoundBeginData = value.data;
-			setRoundData(data);
-		});
-	}
+	useEffect(() => {
+		setSocket((prev) =>
+			prev === undefined ? io("http://localhost:3000", { port: 3000 }) : prev
+		);
+		if (socket !== undefined) {
+			socket.on("connect", () => {
+				console.log("Connected; Socket connection status:", socket.connected); // true
+			});
+			socket.on("connect_error", (err) => {
+				console.log(`connect_error due to ${err.message}`);
+			});
+			socket.on("disconnect", () => {
+				console.log(
+					"Disconnected; Socket connection status:",
+					socket.connected
+				); // false
+			});
+		}
+	}, [socket]);
 
 	function submitTrap(trap: Trap) {
 		const data: SubmitTrapData = {
