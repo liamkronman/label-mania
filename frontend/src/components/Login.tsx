@@ -56,7 +56,7 @@ const Login = () => {
                     placeholder="Enter your password..."
                     aria-label="password"
                 />
-                <button type="button" onClick={handleSubmit}>Submit</button>
+                <button type="button" onClick={handleSubmit}>Log In</button>
             </form>
             <Link to={"../signup"}>Don't have an account?</Link>
         </div>
