@@ -43,6 +43,8 @@ const Canvas = (props: any) => {
 		const imgRect = imgRef.current?.getBoundingClientRect();
 		const canvasRect = canvasRef.current?.getBoundingClientRect();
 		if (imgRect === undefined || canvasRect === undefined) return null;
+		console.log(trap);
+		console.log(imgRect);
 		return {
 			top: trap.top * imgRect.height - canvasRect.y + imgRect.y,
 			bottom: trap.bottom * imgRect.height - canvasRect.y + imgRect.y,
@@ -103,22 +105,24 @@ const Canvas = (props: any) => {
 	}, [position.fixedX, position.fixedY, position.finalX, position.finalY]);
 
 	useEffect(() => {
+		if (canvasRef.current === null) return;
+		const canvas: HTMLCanvasElement = canvasRef.current;
+		const ctx = canvas.getContext("2d");
+		if (ctx === null) return;
+		ctx.canvas.width = window.innerWidth;
+		ctx.canvas.height = window.innerHeight;
+		ctx.lineWidth = 5;
+		ctx.strokeStyle = "#2228";
+		ctx.fillStyle = "#8888";
+
 		if (
 			((position.currX !== null && position.currY !== null) ||
 				(position.finalX !== null && position.finalY !== null)) &&
 			(position.fixedX || position.fixedX === 0) &&
 			(position.fixedY || position.fixedY === 0)
 		) {
-			if (canvasRef.current === null) return;
-			const canvas: HTMLCanvasElement = canvasRef.current;
-			const ctx = canvas.getContext("2d");
-			if (ctx === null) return;
-			ctx.canvas.width = window.innerWidth;
-			ctx.canvas.height = window.innerHeight;
-
 			/* Player's trap */
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-			ctx.fillStyle = "#8888";
 			ctx.beginPath();
 			if (
 				position.finalX !== null &&
@@ -157,23 +161,42 @@ const Canvas = (props: any) => {
 					position.currY - position.fixedY
 				);
 			}
+			ctx.stroke();
+			ctx.closePath();
+		}
 
-			/* Opponents' traps */
+		/* Opponents' traps */
 
-			if (additionalTraps !== undefined)
-				for (const [, val] of Object.entries(additionalTraps)) {
-					const trap = toAbsCoords(val);
-					if (trap === null) continue; // todo: Throw an error
+		ctx.fillStyle = "#f837";
+		if (additionalTraps !== undefined)
+			for (const [, val] of Object.entries(additionalTraps)) {
+				const trap = toAbsCoords(val);
+				console.log(trap);
+				if (trap === null) continue; // todo: Throw an error
+
+				ctx.beginPath();
+				if (val.strokeStyle) ctx.strokeStyle = val.strokeStyle;
+				else ctx.strokeStyle = "#f83f";
+				ctx.rect(
+					trap.left,
+					trap.top,
+					trap.right - trap.left,
+					trap.bottom - trap.top
+				);
+
+				if (val.fillStyle) {
+					ctx.fillStyle = val.fillStyle;
 					ctx.fillRect(
-						trap.top,
 						trap.left,
-						trap.bottom - trap.top,
-						trap.right - trap.left
+						trap.top,
+						trap.right - trap.left,
+						trap.bottom - trap.top
 					);
 				}
+				ctx.closePath();
+			}
 
-			ctx.stroke();
-		}
+		ctx.stroke();
 	});
 
 	useEffect(() => {
@@ -190,7 +213,6 @@ const Canvas = (props: any) => {
 			left: Math.min(position.fixedX, position.finalX),
 			right: Math.max(position.fixedX, position.finalX),
 		};
-		console.log("Trap made", toRelCoords(trap));
 		submitTrap(toRelCoords(trap));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [position.finalX]);

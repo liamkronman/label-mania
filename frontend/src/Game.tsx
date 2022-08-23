@@ -22,7 +22,7 @@ const Game = (props: any) => {
 	const [scores, setScores] = useState<{ [key: string]: number }>();
 	const [additionalTraps, setAdditionalTraps] = useState<{
 		[key: string]: DisplayTrapData;
-	}>();
+	}>({ player1: { top: 0.25, bottom: 0.75, left: 0.25, right: 0.75 } });
 
 	const imgRef = useRef<HTMLImageElement>(null);
 
@@ -61,6 +61,7 @@ const Game = (props: any) => {
 							style={{ zIndex: 1, position: "absolute", top: 0 }}
 							submitTrap={submitTrap}
 							imgRef={imgRef}
+							additionalTraps={additionalTraps}
 						/>
 					</>
 				)) || <>Waiting for game to start</>}

@@ -17,7 +17,10 @@ export interface Trap {
 	left: number;
 }
 
-export interface DisplayTrapData extends Trap {}
+export interface DisplayTrapData extends Trap {
+	strokeStyle?: string;
+	fillStyle?: string;
+}
 
 export interface SubmitTrapData extends Trap {}
 
