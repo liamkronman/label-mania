@@ -20,7 +20,7 @@ const Signup = () => {
     }, [usernameRef]);
 
     const handleSubmit = () => {
-        if (password !== confirmPassword) {
+        if (password === confirmPassword) {
             axios.post("http://159.223.143.90/api/auth/signup", {
                 username,
                 password
