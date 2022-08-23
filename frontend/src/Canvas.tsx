@@ -1,5 +1,5 @@
-import { assert } from "console";
-import React, { useRef, useEffect, useState, SetStateAction } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { DisplayTrapData, Trap } from "./GameTypes";
 
 interface PositionData {
 	currX: number | null;
@@ -11,6 +11,10 @@ interface PositionData {
 }
 
 const Canvas = (props: any) => {
+	const submitTrap = props.submitTrap;
+	const additionalTraps: { [key: string]: DisplayTrapData } | undefined =
+		props.additionalTraps;
+	const imgRef: React.RefObject<HTMLImageElement> = props.imgRef;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [position, setPosition] = useState<PositionData>({
 		currX: null,
@@ -21,32 +25,80 @@ const Canvas = (props: any) => {
 		finalY: null,
 	});
 
+	function toRelCoords(trap: Trap) {
+		// Proportion of image
+		const imgRect = imgRef.current?.getBoundingClientRect();
+		const canvasRect = canvasRef.current?.getBoundingClientRect();
+		if (imgRect === undefined || canvasRect === undefined) return null;
+		return {
+			top: (trap.top + canvasRect.y - imgRect.y) / imgRect.height,
+			bottom: (trap.bottom + canvasRect.y - imgRect.y) / imgRect.height,
+			left: (trap.left + canvasRect.x - imgRect.x) / imgRect.width,
+			right: (trap.right + canvasRect.x - imgRect.x) / imgRect.width,
+		};
+	}
+
+	function toAbsCoords(trap: Trap) {
+		// Relative to canvas
+		const imgRect = imgRef.current?.getBoundingClientRect();
+		const canvasRect = canvasRef.current?.getBoundingClientRect();
+		if (imgRect === undefined || canvasRect === undefined) return null;
+		return {
+			top: trap.top * imgRect.height - canvasRect.y + imgRect.y,
+			bottom: trap.bottom * imgRect.height - canvasRect.y + imgRect.y,
+			left: trap.left * imgRect.width - canvasRect.x + imgRect.x,
+			right: trap.right * imgRect.width - canvasRect.x + imgRect.x,
+		};
+	}
+
+	// todo: bug: If you right click & inspect element, you can be be dragging without having clicked
 	useEffect(() => {
 		document.addEventListener("mousemove", (e) => {
-			setPosition((prev) => ({ ...prev, currX: e.clientX, currY: e.clientY }));
+			setPosition((prev) => {
+				const canvasRect = canvasRef.current?.getBoundingClientRect();
+				if (canvasRect === undefined) return prev; // todo: throw error
+				return {
+					...prev,
+					currX: e.clientX - canvasRect.x,
+					currY: e.clientY - canvasRect.y,
+				};
+			});
 		});
 		document.addEventListener("mousedown", (e) => {
-			setPosition((prev) =>
-				prev.finalX == null // to ensure you cannot redraw the box
-					? {
-							...prev,
-							fixedX: e.clientX,
-							fixedY: e.clientY,
-							finalX: null,
-							finalY: null,
-					  }
-					: prev
-			);
+			setPosition((prev) => {
+				if (prev.finalX == null) {
+					// to ensure you cannot redraw the box
+					const canvasRect = canvasRef.current?.getBoundingClientRect();
+					if (canvasRect === undefined) return prev; // todo: throw error
+					return {
+						...prev,
+						fixedX: e.clientX - canvasRect.x,
+						fixedY: e.clientY - canvasRect.y,
+						finalX: null,
+						finalY: null,
+					};
+				}
+				return prev;
+			});
 		});
 		document.addEventListener("mouseup", (e) => {
-			setPosition((prev) =>
-				prev.fixedX !== null &&
-				prev.fixedY !== null &&
-				prev.finalX === null &&
-				prev.finalY === null
-					? { ...prev, finalX: e.clientX, finalY: e.clientY }
-					: prev
-			);
+			setPosition((prev) => {
+				if (
+					prev.fixedX !== null &&
+					prev.fixedY !== null &&
+					prev.finalX === null &&
+					prev.finalY === null
+				) {
+					const canvasRect = canvasRef.current?.getBoundingClientRect();
+					if (canvasRect === undefined) return prev; // todo: throw error
+					return {
+						...prev,
+						finalX: e.clientX - canvasRect.x,
+						finalY: e.clientY - canvasRect.y,
+					};
+				}
+				return prev;
+			});
 		});
 	}, [position.fixedX, position.fixedY, position.finalX, position.finalY]);
 
@@ -64,6 +116,7 @@ const Canvas = (props: any) => {
 			ctx.canvas.width = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
 
+			/* Player's trap */
 			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 			ctx.fillStyle = "#8888";
 			ctx.beginPath();
@@ -74,14 +127,14 @@ const Canvas = (props: any) => {
 				position.fixedY !== null
 			) {
 				ctx.fillRect(
-					position.fixedX - canvas.getBoundingClientRect().left, // todo: changes if you scroll
-					position.fixedY - canvas.getBoundingClientRect().top,
+					position.fixedX, // todo: changes if you scroll
+					position.fixedY,
 					position.finalX - position.fixedX,
 					position.finalY - position.fixedY
 				);
 				ctx.rect(
-					position.fixedX - canvas.getBoundingClientRect().left, // todo: changes if you scroll
-					position.fixedY - canvas.getBoundingClientRect().top,
+					position.fixedX,
+					position.fixedY,
 					position.finalX - position.fixedX,
 					position.finalY - position.fixedY
 				);
@@ -92,28 +145,36 @@ const Canvas = (props: any) => {
 				position.currY !== null
 			) {
 				ctx.fillRect(
-					position.fixedX - canvas.getBoundingClientRect().left,
-					position.fixedY - canvas.getBoundingClientRect().top,
+					position.fixedX,
+					position.fixedY,
 					position.currX - position.fixedX,
 					position.currY - position.fixedY
 				);
 				ctx.rect(
-					position.fixedX - canvas.getBoundingClientRect().left,
-					position.fixedY - canvas.getBoundingClientRect().top,
+					position.fixedX,
+					position.fixedY,
 					position.currX - position.fixedX,
 					position.currY - position.fixedY
 				);
 			}
+
+			/* Opponents' traps */
+
+			if (additionalTraps !== undefined)
+				for (const [, val] of Object.entries(additionalTraps)) {
+					const trap = toAbsCoords(val);
+					if (trap === null) continue; // todo: Throw an error
+					ctx.fillRect(
+						trap.top,
+						trap.left,
+						trap.bottom - trap.top,
+						trap.right - trap.left
+					);
+				}
+
 			ctx.stroke();
 		}
-	}, [
-		position.currX,
-		position.currY,
-		position.finalX,
-		position.finalY,
-		position.fixedX,
-		position.fixedY,
-	]);
+	});
 
 	useEffect(() => {
 		if (
@@ -123,18 +184,16 @@ const Canvas = (props: any) => {
 			position.finalY === null
 		)
 			return;
-		const top = Math.min(position.fixedY, position.finalY);
-		const bottom = Math.max(position.fixedY, position.finalY);
-		const left = Math.min(position.fixedX, position.finalX);
-		const right = Math.max(position.fixedX, position.finalX);
-		props.submitTrap({ top, right, bottom, left });
-	}, [
-		props, // props should never change
-		position.fixedX,
-		position.fixedY,
-		position.finalX,
-		position.finalY,
-	]);
+		const trap = {
+			top: Math.min(position.fixedY, position.finalY),
+			bottom: Math.max(position.fixedY, position.finalY),
+			left: Math.min(position.fixedX, position.finalX),
+			right: Math.max(position.fixedX, position.finalX),
+		};
+		console.log("Trap made", toRelCoords(trap));
+		submitTrap(toRelCoords(trap));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [position.finalX]);
 
 	return <canvas ref={canvasRef} {...props} />;
 };
