@@ -23,9 +23,9 @@ const Game = (props: any) => {
 	const [additionalTraps, setAdditionalTraps] = useState<{
 		[key: string]: DisplayTrapData;
 	}>();
-	
+
 	const [accessToken, setAccessToken] = useState<any>(null);
-	
+
 	useEffect(() => {
 		const token = localStorage.getItem("accessToken");
 		if (token) {
@@ -38,9 +38,7 @@ const Game = (props: any) => {
 	const imgRef = useRef<HTMLImageElement>(null);
 
 	useEffect(() => {
-		setSocket((prev) =>
-			prev === undefined ? io("http://159.223.143.90") : prev
-		);
+		setSocket((prev) => (prev === undefined ? io("localhost:3000") : prev));
 		if (socket !== undefined) {
 			socket.on("connect", () => {
 				console.log("Connected; Socket connection status:", socket.connected); // true

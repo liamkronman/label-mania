@@ -2,8 +2,8 @@ const uuidv4 = require("uuid").v4;
 
 var games = new Map();
 
-const ROUND_TIMEOUT = 30;
-const ROUND_DELAY = 10;
+const ROUND_TIMEOUT = 5;
+const ROUND_DELAY = 2;
 
 class GameRoom {
 	constructor(gameID) {
@@ -64,9 +64,33 @@ class Round {
 	}
 	median(arr) {
 		n = arr.length;
-    this.nth_ele(arr, 0, arr.length, n//2);
+		if (n % 2 == 1) {
+			this.nth_ele(arr, 0, arr.length, (n - 1) / 2);
+			return arr[(n - 1) / 2];
+		} else {
+			this.nth_ele(arr, 0, arr.length, n / 2);
+			this.nth_ele(arr, n / 2, arr.length, 0); // todo: this is slow as shit lmao
+			return (arr[n / 2] + arr[n / 2 + 1]) / 2;
+		}
 	}
-	computeTruth() {}
+	computeTruth() {
+		top = [];
+		bottom = [];
+		left = [];
+		right = [];
+		for (const [, val] in Object.entries(this.userTraps)) {
+			top.push(val.top);
+			bottom.push(val.bottom);
+			left.push(val.left);
+			right.push(val.right);
+		}
+		return {
+			top: this.median(top),
+			bottom: median(bottom),
+			left: this.median(left),
+			right: this.median(right),
+		};
+	}
 }
 
 function joinGameRoom(socketID, gameID) {
@@ -100,9 +124,7 @@ class Connection {
 		});
 
 		/* Request round start */
-		socket.on("request_round_start", () => {
-			this.gameroom.startRound();
-		});
+		this.gameroom.startRound(this.io);
 
 		socket.on("connect_error", (err) => {
 			console.log(`connect_error due to ${err.message}`);
