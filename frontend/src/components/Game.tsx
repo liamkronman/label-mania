@@ -7,7 +7,7 @@ import {
 	RoundEndData,
 	SubmitTrapData,
 	Trap,
-} from "./GameTypes";
+} from "../types/GameTypes";
 
 import { io, Socket } from "socket.io-client";
 
