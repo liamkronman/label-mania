@@ -12,15 +12,9 @@ import {
 import { io, Socket } from "socket.io-client";
 
 const POST_BACKEND_URL = "./idk_where";
-const SAMPLE_ROUND_BEGIN_DATA = {
-	imgurl: "./cat.webp",
-	target: "cat",
-};
 
 const Game = (props: any) => {
-	const [roundData, setRoundData] = useState<RoundBeginData>(
-		SAMPLE_ROUND_BEGIN_DATA
-	);
+	const [roundData, setRoundData] = useState<RoundBeginData>();
 	const [socket, setSocket] = useState<Socket>();
 
 	const [scores, setScores] = useState<{ [key: string]: number }>();
@@ -46,6 +40,24 @@ const Game = (props: any) => {
 					"Disconnected; Socket connection status:",
 					socket.connected
 				); // false
+			});
+
+			socket.on("debug", (data) => {
+				console.log("Debug:", data);
+			});
+			socket.on("begin_game", (data) => {
+				console.log("Game has begun!");
+				setScores(data.scores);
+			});
+			socket.on("begin_round", (data) => {
+				console.log("Round has begun!");
+				setRoundData(data);
+				setAdditionalTraps(undefined);
+			});
+			socket.on("end_round", (data) => {
+				console.log("Round has ended!");
+				setScores(data.scores);
+				setAdditionalTraps(data.traps);
 			});
 		}
 	}, [socket]);
