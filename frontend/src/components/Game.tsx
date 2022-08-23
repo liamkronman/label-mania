@@ -39,7 +39,7 @@ const Game = (props: any) => {
 
 	useEffect(() => {
 		setSocket((prev) =>
-			prev === undefined ? io("http://159.223.143.90", { port: 3000 }) : prev
+			prev === undefined ? io("http://159.223.143.90") : prev
 		);
 		if (socket !== undefined) {
 			socket.on("connect", () => {
