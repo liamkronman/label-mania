@@ -1,3 +1,4 @@
+import { assert } from "console";
 import React, { useRef, useEffect, useState, SetStateAction } from "react";
 
 interface PositionData {
@@ -26,7 +27,7 @@ const Canvas = (props: any) => {
 		});
 		document.addEventListener("mousedown", (e) => {
 			setPosition((prev) =>
-				prev.finalX == null
+				prev.finalX == null // to ensure you cannot redraw the box
 					? {
 							...prev,
 							fixedX: e.clientX,
@@ -112,6 +113,27 @@ const Canvas = (props: any) => {
 		position.finalY,
 		position.fixedX,
 		position.fixedY,
+	]);
+
+	useEffect(() => {
+		if (
+			position.fixedY === null ||
+			position.fixedX === null ||
+			position.finalX === null ||
+			position.finalY === null
+		)
+			return;
+		const top = Math.min(position.fixedY, position.finalY);
+		const bottom = Math.max(position.fixedY, position.finalY);
+		const left = Math.min(position.fixedX, position.finalX);
+		const right = Math.max(position.fixedX, position.finalX);
+		props.submitTrap({ top, right, bottom, left });
+	}, [
+		props, // props should never change
+		position.fixedX,
+		position.fixedY,
+		position.finalX,
+		position.finalY,
 	]);
 
 	return <canvas ref={canvasRef} {...props} />;
