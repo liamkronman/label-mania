@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { DisplayTrapData, Trap } from "./GameTypes";
+import { DisplayTrapData, Trap } from "../types/GameTypes";
 
 interface PositionData {
 	currX: number | null;

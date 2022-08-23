@@ -7,7 +7,7 @@ import {
 	RoundEndData,
 	SubmitTrapData,
 	Trap,
-} from "./GameTypes";
+} from "../types/GameTypes";
 
 const POST_BACKEND_URL = "./idk_where";
 const SAMPLE_ROUND_BEGIN_DATA = {
