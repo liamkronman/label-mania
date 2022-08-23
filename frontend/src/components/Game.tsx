@@ -8,12 +8,14 @@ import {
 	SubmitTrapData,
 	Trap,
 } from "../types/GameTypes";
+import { useNavigate } from "react-router-dom";
 
 import { io, Socket } from "socket.io-client";
 
 const POST_BACKEND_URL = "./idk_where";
 
 const Game = (props: any) => {
+	const navigate = useNavigate();
 	const [roundData, setRoundData] = useState<RoundBeginData>();
 	const [socket, setSocket] = useState<Socket>();
 
@@ -21,12 +23,23 @@ const Game = (props: any) => {
 	const [additionalTraps, setAdditionalTraps] = useState<{
 		[key: string]: DisplayTrapData;
 	}>();
+	
+	const [accessToken, setAccessToken] = useState<any>(null);
+	
+	useEffect(() => {
+		const token = localStorage.getItem("accessToken");
+		if (token) {
+			setAccessToken(localStorage.getItem("accessToken"));
+		} else {
+			navigate("../login");
+		}
+	}, []);
 
 	const imgRef = useRef<HTMLImageElement>(null);
 
 	useEffect(() => {
 		setSocket((prev) =>
-			prev === undefined ? io("http://localhost:3000", { port: 3000 }) : prev
+			prev === undefined ? io("http://159.223.143.90", { port: 3000 }) : prev
 		);
 		if (socket !== undefined) {
 			socket.on("connect", () => {
