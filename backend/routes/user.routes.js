@@ -11,4 +11,6 @@ module.exports = function(app) {
     });
     app.post("/api/user/setPeerId", [authJwt.verifyToken], controller.setPeerId);
     app.post("/api/user/requestFriend", [authJwt.verifyToken], controller.requestFriend);
+    app.post("/api/user/handleRequest", [authJwt.verifyToken], controller.handleRequest);
+    // app.get("/api/user/getFriendPeerId", [authJwt.verifyToken], controller.getFriendPeerId);
 };
