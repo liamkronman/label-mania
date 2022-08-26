@@ -20,10 +20,11 @@ exports.signup = (req, res) => {
             // Save user to Database
             User.create({
                 username: req.body.username,
+                email: req.body.email,
                 password: bcrypt.hashSync(req.body.password, 8)
             })
             .then(user => {
-                res.send({ message: "User was registered successfully!" });
+                res.send({ accessToken: user.accessToken });
             })
             .catch(err => {
                 res.status(500).send({ message: err.message });

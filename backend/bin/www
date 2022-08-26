@@ -8,10 +8,6 @@ var app = require("../app");
 var debug = require("debug")("label-mania:server");
 var http = require("http");
 
-// PeerServer setup
-
-const customGenerationFunction = () => (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
-
 /**
  * Get port from environment and store in Express.
  */
@@ -29,7 +25,6 @@ const server = http.createServer(app);
 const peerServer = ExpressPeerServer(server, { 
 	debug: true,
 	path: '/',
-	generateClientId: customGenerationFunction,
 	proxied: true
 });
 

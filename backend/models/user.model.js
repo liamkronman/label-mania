@@ -11,6 +11,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         profilePic: {
             type: Sequelize.STRING
+        },
+        peerId: {
+            type: Sequelize.STRING
         }
     });
     return User;
