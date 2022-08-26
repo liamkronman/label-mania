@@ -22,5 +22,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
+db.request = require("../models/request.model.js")(sequelize, Sequelize, db.user);
+db.friendship = require("../models/friendship.model.js")(sequelize, Sequelize, db.user);
 
 module.exports = db;
