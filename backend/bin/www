@@ -3,10 +3,14 @@
 /**
  * Module dependencies.
  */
-
+const { ExpressPeerServer } = require('peer');
 var app = require("../app");
 var debug = require("debug")("label-mania:server");
 var http = require("http");
+
+// PeerServer setup
+
+const customGenerationFunction = () => (Math.random().toString(36) + '0000000000000000000').substr(2, 16);
 
 /**
  * Get port from environment and store in Express.
@@ -19,23 +23,33 @@ app.set("port", port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
+
+// peer server initialize
+const peerServer = ExpressPeerServer(server, { 
+	debug: true,
+	path: '/',
+	generateClientId: customGenerationFunction,
+	proxied: true
+});
+
+app.use('/peerjs', peerServer);
 
 /**
  * Socket IO stuff
  */
-const { Server } = require("socket.io");
-const game = require("../game");
+// const { Server } = require("socket.io");
+// const game = require("../game");
 
-const io = new Server(server, {
-	cors: {
-		origin: "*",
-		methods: ["GET", "POST"],
-	},
-	rejectUnauthorized: false,
-});
+// const io = new Server(server, {
+// 	cors: {
+// 		origin: "*",
+// 		methods: ["GET", "POST"],
+// 	},
+// 	rejectUnauthorized: false,
+// });
 
-game(io);
+// game(io);
 
 /**
  * Listen on provided port, on all network interfaces.
