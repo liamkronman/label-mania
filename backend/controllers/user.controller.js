@@ -101,3 +101,50 @@ exports.handleRequest = (req, res) => {
         res.status(500).send({ message: err.message });
     })
 };
+
+exports.getFriendPeerId = (req, res) => {
+    User.findOne({
+        where: {
+            id: req.userId
+        }
+    })
+    .then(userMe => {
+        Friendship.findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        friend1: userMe.username,
+                        friend2: req.body.friendUsername
+                    },
+                    {
+                        friend1: req.body.friendUsername,
+                        friend2: userMe.username
+                    }
+                ]
+            }
+        })
+        .then(friendship => {
+            if (friendship) {
+                User.findOne({
+                    where: {
+                        username: req.body.friendUsername
+                    }
+                })
+                .then(friend => {
+                    res.send({ friendPeerId: friend.peerId });
+                })
+                .catch(err => {
+                    res.status(500).send({ message: "Couldn't find friend." });
+                })
+            } else {
+                res.status(500).send({ message: "Couldn't verify friendship." });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message: "Couldn't verify friendship." });
+        })
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message });
+    })
+};
