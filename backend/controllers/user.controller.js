@@ -3,6 +3,7 @@ const User = db.user;
 const Request = db.request;
 const Friendship = db.friendship;
 const Sequelize = require('sequelize');
+const socketServer = require("../socketServer");
 const Op = Sequelize.Op;
 
 exports.setPeerId = (req, res) => {
@@ -39,6 +40,7 @@ exports.requestFriend = (req, res) => {
                 requested: futureFriend.username
             })
             .then(request => {
+                socketServer.notifyRequest(futureFriend.id, userMe.username);
                 res.send({ message: "Request successfully sent!" });
             })
             .catch(err => {
