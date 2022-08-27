@@ -3,7 +3,7 @@ const User = db.user;
 const Request = db.request;
 const Friendship = db.friendship;
 const Sequelize = require('sequelize');
-const socketServer = require("../socketServer");
+const { notifyRequest } = require("../socketServer");
 const Op = Sequelize.Op;
 
 exports.setPeerId = (req, res) => {
@@ -35,16 +35,28 @@ exports.requestFriend = (req, res) => {
             }
         })
         .then(futureFriend => {
-            Request.create({
-                requester: userMe.username,
-                requested: futureFriend.username
+            Request.findOne({
+                where: {
+                    requester: userMe.username,
+                    requested: futureFriend.username
+                }
             })
             .then(request => {
-                socketServer.notifyRequest(futureFriend.id, userMe.username);
-                res.send({ message: "Request successfully sent!" });
-            })
-            .catch(err => {
-                res.status(500).send({ message: err.message });
+                if (!request) {
+                    Request.create({
+                        requester: userMe.username,
+                        requested: futureFriend.username
+                    })
+                    .then(request => {
+                        notifyRequest(futureFriend.id, userMe.username);
+                        res.send({ message: "Request successfully sent!" });
+                    })
+                    .catch(err => {
+                        res.status(500).send({ message: err.message });
+                    })
+                } else {
+                    res.status(500).send({ message: "Request already exists." })
+                }
             })
         })
         .catch(err => {
@@ -169,7 +181,6 @@ exports.searchUser = (req, res) => {
             let newUsers = [];
             if (users) {
                 for (let i = 0; i < users.length; i++) {
-                    console.log(users[i])
                     Friendship.findOne({
                         where: {
                             [Op.or]: [

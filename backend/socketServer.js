@@ -14,7 +14,7 @@ exports.notifyRequest = (userId, requesterUsername) => {
         onlineUsers[userId].emit('friendReq', requesterUsername);
 };
 
-module.exports = (server) => {
+exports.socketSetup = (server) => {
     const io = new Server(server, {
         cors: {
             origin: "*",
@@ -76,7 +76,7 @@ module.exports = (server) => {
 
         incomingReqs.forEach(req => socket.emit('friendReq', req.requester));
 
-        friendIds.forEach(([friendId, friendUsername]) => {
+        friends.forEach(([friendId, friendUsername]) => {
             if (onlineUsers[friendId]) {
                 onlineUsers[friendId].emit('status', { type: 'on', username: user.username });
                 socket.emit('status', { type: 'on', username: friendUsername });

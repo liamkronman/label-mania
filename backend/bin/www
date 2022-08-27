@@ -48,7 +48,7 @@ app.use('/peerjs', peerServer);
 
 // game(io);
 
-require('../socketServer.js')(server);
+require('../socketServer.js').socketSetup(server);
 
 /**
  * Listen on provided port, on all network interfaces.
