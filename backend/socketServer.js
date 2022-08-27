@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require("./config/auth.config.js");
 const { Server } = require('socket.io');
 
-const db = require("../models");
+const db = require("./models");
 const User = db.user;
 const Request = db.request;
 const Friendship = db.friendship;

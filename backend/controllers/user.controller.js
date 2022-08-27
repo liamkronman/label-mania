@@ -150,3 +150,23 @@ exports.getFriendPeerId = (req, res) => {
         res.status(500).send({ message: err.message });
     })
 };
+
+exports.searchUser = (req, res) => {
+    User.findAll({
+        where: {
+            username: {
+                [Op.like]: '%' + req.body.searchUsername + '%'
+            }
+        }
+    })
+    .then(users => {
+        if (users) {
+            res.send({users: users});
+        } else {
+            res.status(500).send({ message: "User not found." });
+        }
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message });
+    })
+};
