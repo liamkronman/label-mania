@@ -45,7 +45,7 @@ exports.socketSetup = (server) => {
                 requested: user.username
             }
         });
-        const friends = await Friendship.findAll({
+        const friends = Promise.all((await Friendship.findAll({
             where: {
                 [Op.or]: [
                     {
@@ -62,7 +62,7 @@ exports.socketSetup = (server) => {
                     username: friend
                 }
             })).id, friend]
-        );
+        )));
 
         onlineUsers[userId] = socket;
 
