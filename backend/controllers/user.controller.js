@@ -185,8 +185,8 @@ exports.searchUser = (req, res) => {
                         where: {
                             [Op.or]: [
                                 {
-                                    friend1: userMe[i]["dataValues"]["username"],
-                                    friend2: users[i].username
+                                    friend1: userMe.username,
+                                    friend2: users[i]["dataValues"]["username"]
                                 },
                                 {
                                     friend1: users[i]["dataValues"]["username"],
