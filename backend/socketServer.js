@@ -6,6 +6,8 @@ const db = require("./models");
 const User = db.user;
 const Request = db.request;
 const Friendship = db.friendship;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 const onlineUsers = {};
 
