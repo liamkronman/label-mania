@@ -185,11 +185,11 @@ exports.searchUser = (req, res) => {
                         where: {
                             [Op.or]: [
                                 {
-                                    friend1: userMe.username,
-                                    friend2: req.body.searchUsername
+                                    friend1: userMe[i]["dataValues"]["username"],
+                                    friend2: users[i].username
                                 },
                                 {
-                                    friend1: req.body.searchUsername,
+                                    friend1: users[i]["dataValues"]["username"],
                                     friend2: userMe.username
                                 }
                             ]
@@ -203,7 +203,7 @@ exports.searchUser = (req, res) => {
                             Request.findOne({
                                 where: {
                                     requested: userMe.username,
-                                    requester: req.body.searchUsername
+                                    requester: users[i]["dataValues"]["username"]
                                 }
                             })
                             .then(request1 => {
@@ -214,7 +214,7 @@ exports.searchUser = (req, res) => {
                                     Request.findOne({
                                         where: {
                                             requester: userMe.username,
-                                            requested: req.body.searchUsername
+                                            requested: users[i]["dataValues"]["username"]
                                         }
                                     })
                                     .then(request2 => {
