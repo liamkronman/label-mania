@@ -223,7 +223,7 @@ exports.searchUser = (req, res) => {
                                             newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: "Requested"});
                                             if (newUsers.length === users.length) res.send({users: newUsers});
                                         } else {
-                                            newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: "None"});
+                                            newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: userMe.username === users[i]["dataValues"]["username"] ? 'self' : "None"});
                                             if (newUsers.length === users.length) res.send({users: newUsers});
                                         }
                                     })
