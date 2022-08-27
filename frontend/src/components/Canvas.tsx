@@ -1,14 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { DisplayTrapData, Trap } from "../types/GameTypes";
-
-interface PositionData {
-	currX: number | null;
-	currY: number | null;
-	fixedX: number | null;
-	fixedY: number | null;
-	finalX: number | null;
-	finalY: number | null;
-}
+import React, { SetStateAction, useEffect, useRef, useState } from "react";
+import { DisplayTrapData, PositionData, Trap } from "../types/GameTypes";
 
 const Canvas = (props: any) => {
 	const submitTrap = props.submitTrap;
@@ -16,14 +7,9 @@ const Canvas = (props: any) => {
 		props.additionalTraps;
 	const imgRef: React.RefObject<HTMLImageElement> = props.imgRef;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [position, setPosition] = useState<PositionData>({
-		currX: null,
-		currY: null,
-		fixedX: null,
-		fixedY: null,
-		finalX: null,
-		finalY: null,
-	});
+	const position: PositionData = props.position;
+	const setPosition: React.Dispatch<React.SetStateAction<PositionData>> =
+		props.setPosition;
 
 	function toRelCoords(trap: Trap) {
 		// Proportion of image

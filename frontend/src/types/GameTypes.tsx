@@ -4,6 +4,14 @@ export interface InitData {
 	userid: USERID_TYPE;
 }
 
+export interface PositionData {
+	currX: number | null;
+	currY: number | null;
+	fixedX: number | null;
+	fixedY: number | null;
+	finalX: number | null;
+	finalY: number | null;
+}
 export interface RoundBeginData {
 	// All the information client needs to begin the round
 	imgurl: string;

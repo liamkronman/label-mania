@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Canvas from "./Canvas";
 import {
 	DisplayTrapData,
+	PositionData,
 	RoundBeginData,
 	RoundEndData,
 	SubmitTrapData,
@@ -23,6 +24,14 @@ const Game = (props: any) => {
 	const [additionalTraps, setAdditionalTraps] = useState<{
 		[key: string]: DisplayTrapData;
 	}>();
+	const [position, setPosition] = useState<PositionData>({
+		currX: null,
+		currY: null,
+		fixedX: null,
+		fixedY: null,
+		finalX: null,
+		finalY: null,
+	});
 
 	const [accessToken, setAccessToken] = useState<any>(null);
 
@@ -64,6 +73,14 @@ const Game = (props: any) => {
 				console.log("Round has begun!");
 				setRoundData(data);
 				setAdditionalTraps(undefined);
+				setPosition({
+					currX: null,
+					currY: null,
+					fixedX: null,
+					fixedY: null,
+					finalX: null,
+					finalY: null,
+				});
 			});
 			socket.on("end_round", (data) => {
 				console.log("Round has ended!");
@@ -102,6 +119,8 @@ const Game = (props: any) => {
 							submitTrap={submitTrap}
 							imgRef={imgRef}
 							additionalTraps={additionalTraps}
+							position={position}
+							setPosition={setPosition}
 						/>
 					</>
 				)) || <>Waiting for game to start</>}
