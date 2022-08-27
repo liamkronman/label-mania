@@ -16,6 +16,23 @@ exports.notifyRequest = (userId, requesterUsername) => {
         onlineUsers[userId].emit('friendReq', requesterUsername);
 };
 
+exports.notifyFriendAccept = async (username1, username2) => {
+    const user1 = await User.findOne({
+        where: {
+            username: username1
+        }
+    });
+    const user2 = await User.findOne({
+        where: {
+            username: username2
+        }
+    });
+    if (onlineUsers[user1.id] && onlineUsers[user2.id]) {
+        onlineUsers[user1.id].emit('status', { type: 'on', username: username2 });
+        onlineUsers[user2.id].emit('status', { type: 'on', username: username1 });
+    }
+};
+
 exports.socketSetup = (server) => {
     const io = new Server(server, {
         cors: {

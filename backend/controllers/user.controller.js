@@ -3,7 +3,7 @@ const User = db.user;
 const Request = db.request;
 const Friendship = db.friendship;
 const Sequelize = require('sequelize');
-const { notifyRequest } = require("../socketServer");
+const { notifyRequest, notifyFriendAccept } = require("../socketServer");
 const Op = Sequelize.Op;
 
 exports.setPeerId = (req, res) => {
@@ -95,6 +95,7 @@ exports.handleRequest = (req, res) => {
                     })
                     .then(() => {
                         res.send({ message: "Friendship successfully created!" });
+                        notifyFriendAccept(req.body.potentialFriendUsername, userMe.username);
                     })
                     .catch(err => {
                         res.status(500).send({ message: err.message });
