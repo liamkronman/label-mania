@@ -152,19 +152,81 @@ exports.getFriendPeerId = (req, res) => {
 };
 
 exports.searchUser = (req, res) => {
-    User.findAll({
+    User.findOne({
         where: {
-            username: {
-                [Op.like]: '%' + req.body.searchUsername + '%'
-            }
+            id: req.userId
         }
     })
-    .then(users => {
-        if (users) {
-            res.send({users: users});
-        } else {
-            res.status(500).send({ message: "User not found." });
-        }
+    .then(userMe => {
+        User.findAll({
+            where: {
+                username: {
+                    [Op.like]: '%' + req.body.searchUsername + '%'
+                }
+            }
+        })
+        .then(users => {
+            let newUsers = [];
+            if (users) {
+                for (let i = 0; i < users.length; i++) {
+                    console.log(users[i])
+                    Friendship.findOne({
+                        where: {
+                            [Op.or]: [
+                                {
+                                    friend1: userMe.username,
+                                    friend2: req.body.searchUsername
+                                },
+                                {
+                                    friend1: req.body.searchUsername,
+                                    friend2: userMe.username
+                                }
+                            ]
+                        }
+                    })
+                    .then(friendship => {
+                        if (friendship) {
+                            newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: "Friends"});
+                            if (newUsers.length === users.length) res.send({users: newUsers});
+                        } else {
+                            Request.findOne({
+                                where: {
+                                    requested: userMe.username,
+                                    requester: req.body.searchUsername
+                                }
+                            })
+                            .then(request1 => {
+                                if (request1) {
+                                    newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: "Being requested"});
+                                    if (newUsers.length === users.length) res.send({users: newUsers});
+                                } else {
+                                    Request.findOne({
+                                        where: {
+                                            requester: userMe.username,
+                                            requested: req.body.searchUsername
+                                        }
+                                    })
+                                    .then(request2 => {
+                                        if (request2) {
+                                            newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: "Requested"});
+                                            if (newUsers.length === users.length) res.send({users: newUsers});
+                                        } else {
+                                            newUsers.push({username: users[i]["dataValues"]["username"], relationStatus: "None"});
+                                            if (newUsers.length === users.length) res.send({users: newUsers});
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            } else {
+                res.status(500).send({ message: "User not found." });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message: err.message });
+        })
     })
     .catch(err => {
         res.status(500).send({ message: err.message });
