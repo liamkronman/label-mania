@@ -12,6 +12,6 @@ module.exports = function(app) {
     app.post("/api/user/setPeerId", [authJwt.verifyToken], controller.setPeerId);
     app.post("/api/user/requestFriend", [authJwt.verifyToken], controller.requestFriend);
     app.post("/api/user/handleRequest", [authJwt.verifyToken], controller.handleRequest);
-    app.get("/api/user/getFriendPeerId", [authJwt.verifyToken], controller.getFriendPeerId);
-    app.get("/api/user/searchUser", [authJwt.verifyToken], controller.searchUser);
+    app.post("/api/user/getFriendPeerId", [authJwt.verifyToken], controller.getFriendPeerId);
+    app.post("/api/user/searchUser", [authJwt.verifyToken], controller.searchUser);
 };
