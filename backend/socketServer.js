@@ -99,7 +99,8 @@ exports.socketSetup = (server) => {
             if (onlineUsers[friendId]) {
                 onlineUsers[friendId].emit('status', { type: 'on', username: user.username });
                 socket.emit('status', { type: 'on', username: friendUsername });
-            }
+            } else
+                socket.emit('status', { type: 'off', username: friendUsername });
         });
     });
 };
